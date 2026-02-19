@@ -1,0 +1,64 @@
+---
+title: "Guide"
+---
+
+## Core Concepts
+
+### Workspace
+
+A **workspace** is a folder that holds all your data:
+
+- `kb/` — Knowledge bases (one DuckDB file per KB)
+- `custom_models/` — Trained ONNX models
+- `drop-in_models/` — Reserved for future use
+
+The current workspace is stored in `~/.justembed/config.json`. You can register multiple workspaces and switch between them in the Web UI.
+
+### Knowledge Bases
+
+Each KB is a DuckDB file. When you create a KB you choose:
+
+- **E5-Small** (default) — General-purpose 384-dim embeddings
+- **Custom model** — A model you trained on your own text
+
+Different KBs can use different models.
+
+### Chunking
+
+Documents are split into **chunks** (default: max 300 tokens per chunk, merge threshold 50). Chunking is deterministic and structure-aware (paragraphs, headings). The Web UI shows a chunk preview before you embed.
+
+### Embedding and Search
+
+- Each chunk is turned into a vector (embedding). Similar meaning → similar vectors.
+- A query is embedded and compared to chunk embeddings (cosine similarity). Results are ranked by score (0.0–1.0).
+
+## Web UI Flow
+
+1. **Setup** — Choose workspace (first run).
+2. **Knowledge bases** — Create a KB, select E5 or a custom model.
+3. **Train model** (optional) — Upload text, set name and options, train. Saves to `workspace/custom_models/<name>/`.
+4. **Upload** — Select file → Preview chunks → Apply chunking → Embed.
+5. **Query** — Enter query, select KB(s), see ranked results with scores.
+
+## Custom Models
+
+- **Training data**: Use a text file (or folder of .txt/.md) that contains the vocabulary and concepts you care about (e.g. medical terms).
+- **Result**: An ONNX model saved in `workspace/custom_models/<name>/`.
+- **Limitation**: Custom models are **lexical** (TF-IDF + MLP). They only “know” words that appeared in the training text. For semantic links (e.g. “hot” → temperature when “hot” never appeared), use E5.
+
+## File Locations
+
+| Item | Location |
+|------|----------|
+| Config | `~/.justembed/config.json` |
+| E5 model | `~/.cache/justembed/` |
+| Custom models | `workspace/custom_models/` |
+| Knowledge bases | `workspace/kb/*.duckdb` |
+
+## Requirements
+
+- Python 3.8+
+- ~500 MB disk, 1 GB RAM, CPU only
+- Offline after install
+
+See [API Reference](reference.qmd) for the full Python API.

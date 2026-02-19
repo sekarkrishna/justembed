@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Train Custom Model - JustEmbed</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 900px; 
+            margin: 20px auto; 
+            padding: 0 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 { color: #2196F3; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 30px; }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        form { 
+            background: #fafafa; 
+            padding: 20px; 
+            border-radius: 5px; 
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        input[type="text"], input[type="number"], input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            padding: 8px;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        button:hover { background: #1976D2; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .requirements {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .requirements ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .requirements li {
+            margin: 5px 0;
+        }
+        .advanced-settings {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .advanced-settings summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            padding: 10px 0;
+        }
+        .advanced-settings summary:hover {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Home</a>
+    
+    <h1>Train Custom Model</h1>
+    
+    <div class="info-box">
+        <strong>🎯 What is this?</strong><br>
+        Train a custom embedding model from your domain-specific text. The model will learn terminology and synonyms specific to your field (medical, legal, finance, etc.).
+    </div>
+
+    <div class="requirements">
+        <strong>📋 Requirements:</strong>
+        <ul>
+            <li><strong>Minimum:</strong> 1000 words (3+ paragraphs)</li>
+            <li><strong>Recommended:</strong> 5000-10000 words (50-100 paragraphs)</li>
+            <li><strong>File format:</strong> .txt or .md</li>
+            <li><strong>Max file size:</strong> 10 MB</li>
+        </ul>
+    </div>
+
+    <div class="warning-box">
+        <strong>⚠️ Important:</strong> Training takes 5-60 seconds depending on corpus size. The page will redirect when complete. Larger corpora (5000+ words) produce better synonym learning.
+    </div>
+
+    <h2>Upload Training Corpus</h2>
+    <form method="post" action="/train-model" enctype="multipart/form-data" id="trainForm" onsubmit="showTrainingProgress()">
+        <div class="form-group">
+            <label for="model_name">Model Name *</label>
+            <input type="text" id="model_name" name="model_name" 
+                   placeholder="my_medical_model" 
+                   pattern="[a-zA-Z0-9_]+" 
+                   required>
+            <div class="help-text">Use alphanumeric characters and underscores only (e.g., medical_uti, finance_basics)</div>
+        </div>
+
+        <div class="form-group">
+            <label for="file">Training File *</label>
+            <input type="file" id="file" name="file" accept=".txt,.md" required>
+            <div class="help-text">Upload a .txt or .md file with your domain text (1000+ words recommended)</div>
+        </div>
+
+        <details class="advanced-settings">
+            <summary>⚙️ Advanced Settings (Optional)</summary>
+            
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="embedding_dim">Embedding Dimension</label>
+                <input type="number" id="embedding_dim" name="embedding_dim" 
+                       value="128" min="64" max="256" step="8">
+                <div class="help-text">Output vector size (64-256). Default: 128. Higher = more capacity but larger model.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="max_features">Max Features</label>
+                <input type="number" id="max_features" name="max_features" 
+                       value="5000" min="1000" max="10000" step="100">
+                <div class="help-text">TF-IDF vocabulary size (1000-10000). Default: 5000. Higher = more terms but slower.</div>
+            </div>
+        </details>
+
+        <div class="form-group" style="margin-top: 30px;">
+            <button type="submit" id="trainBtn">🚀 Train Model</button>
+        </div>
+        
+        <!-- Progress indicator (hidden by default) -->
+        <div id="trainingProgress" style="display: none; margin-top: 20px; padding: 20px; background: #e3f2fd; border-radius: 4px; border-left: 4px solid #2196F3;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; border: 4px solid #2196F3; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div>
+                    <div style="font-weight: 600; color: #1976D2; margin-bottom: 5px;">Training model...</div>
+                    <div style="font-size: 14px; color: #555;">This may take 5-60 seconds depending on corpus size. Please wait...</div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; height: 8px; background: #bbdefb; border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; background: #2196F3; animation: progress 2s ease-in-out infinite;"></div>
+            </div>
+        </div>
+    </form>
+    
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes progress {
+            0% { width: 30%; }
+            50% { width: 70%; }
+            100% { width: 30%; }
+        }
+    </style>
+    
+    <script>
+        function showTrainingProgress() {
+            // Hide the form button
+            document.getElementById('trainBtn').disabled = true;
+            document.getElementById('trainBtn').style.opacity = '0.5';
+            document.getElementById('trainBtn').style.cursor = 'not-allowed';
+            document.getElementById('trainBtn').textContent = 'Training...';
+            
+            // Show progress indicator
+            document.getElementById('trainingProgress').style.display = 'block';
+        }
+    </script>
+
+    <h2>💡 Tips for Best Results</h2>
+    <div class="requirements">
+        <ul>
+            <li><strong>Use domain-specific text:</strong> Medical records, legal documents, financial reports, etc.</li>
+            <li><strong>Include synonyms:</strong> Use both technical and common terms (pyrexia/fever, renal/kidney)</li>
+            <li><strong>More is better:</strong> 50-100 paragraphs produce better models than 10-20</li>
+            <li><strong>Consistent formatting:</strong> Separate paragraphs with blank lines</li>
+            <li><strong>Clean text:</strong> Remove excessive formatting, headers, footers</li>
+        </ul>
+    </div>
+
+    <h2>📚 Example Use Cases</h2>
+    <div class="requirements">
+        <ul>
+            <li><strong>Medical:</strong> Train on medical textbooks to understand pyrexia↔fever, renal↔kidney, UTI↔bladder infection</li>
+            <li><strong>Legal:</strong> Train on legal documents to understand plaintiff↔claimant, liability↔responsibility</li>
+            <li><strong>Finance:</strong> Train on financial reports to understand liquidity↔cash flow, equity↔stock</li>
+            <li><strong>Technical:</strong> Train on documentation to understand domain-specific jargon</li>
+        </ul>
+    </div>
+</body>
+</html>

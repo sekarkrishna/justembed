@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: ../docs
+
+website:
+  title: "JustEmbed"
+  site-url: "https://sekarkrishna.github.io/justembed"
+  repo-url: https://github.com/sekarkrishna/justembed
+  repo-actions: [edit, issue]
+  # Source lives in quarto/ so edit links must point there (not repo root)
+  repo-subdir: quarto
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: getting-started.qmd
+        text: Getting Started
+      - href: guide.qmd
+        text: Guide
+      - href: examples.qmd
+        text: Examples
+      - href: reference.qmd
+        text: API Reference
+  page-navigation: true
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true

@@ -1,0 +1,184 @@
+[
+  {
+    "objectID": "reference.html",
+    "href": "reference.html",
+    "title": "API Reference",
+    "section": "",
+    "text": "Use import justembed as je. Version 0.1.1.\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.register_workspace(path)\nRegister a workspace (does not delete data)\n\n\nje.deregister_workspace(path, confirm=True)\nRemove from registry\n\n\nje.list_workspaces()\nList registered workspaces\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.begin(workspace, port=5424, host=\"127.0.0.1\")\nStart server (blocks)\n\n\nje.begin(..., background=True)\nStart in background\n\n\nje.begin(..., open_browser=True)\nOpen browser after start\n\n\nje.terminate(port)\nStop server\n\n\nje.list_servers()\nList active servers\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.train_model(name, training_data, embedding_dim=128, max_features=5000)\nTrain custom model. training_data = file path or list of strings\n\n\nje.list_models()\nList models (default E5 + custom)\n\n\nje.delete_model(name, confirm=True)\nDelete custom model\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.create_kb(name, model=\"default\")\nCreate KB. model = \"default\" (E5) or custom model name\n\n\nje.list_kbs()\nList KBs with model and chunk count\n\n\nje.delete_kb(name, confirm=True)\nDelete KB\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.add(kb, path=...)\nAdd file or folder (.txt, .md)\n\n\nje.add(kb, text=...)\nAdd raw text\n\n\nje.add(kb, paths=[...])\nAdd multiple files\n\n\nje.add(kb, documents=[{\"text\": \"...\", \"filename\": \"...\"}])\nAdd from dicts\n\n\nje.add(..., max_tokens=300, merge_threshold=50)\nChunking options\n\n\nje.list_history()\nUpload history\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.query(text, kb=\"all\", top_k=5, min_score=0.0)\nSearch. kb = name, list of names, or \"all\"\n\n\n\nReturns list of dicts: {text, score, kb, file, chunk_index, model}."
+  },
+  {
+    "objectID": "reference.html#python-api",
+    "href": "reference.html#python-api",
+    "title": "API Reference",
+    "section": "",
+    "text": "Use import justembed as je. Version 0.1.1.\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.register_workspace(path)\nRegister a workspace (does not delete data)\n\n\nje.deregister_workspace(path, confirm=True)\nRemove from registry\n\n\nje.list_workspaces()\nList registered workspaces\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.begin(workspace, port=5424, host=\"127.0.0.1\")\nStart server (blocks)\n\n\nje.begin(..., background=True)\nStart in background\n\n\nje.begin(..., open_browser=True)\nOpen browser after start\n\n\nje.terminate(port)\nStop server\n\n\nje.list_servers()\nList active servers\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.train_model(name, training_data, embedding_dim=128, max_features=5000)\nTrain custom model. training_data = file path or list of strings\n\n\nje.list_models()\nList models (default E5 + custom)\n\n\nje.delete_model(name, confirm=True)\nDelete custom model\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.create_kb(name, model=\"default\")\nCreate KB. model = \"default\" (E5) or custom model name\n\n\nje.list_kbs()\nList KBs with model and chunk count\n\n\nje.delete_kb(name, confirm=True)\nDelete KB\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.add(kb, path=...)\nAdd file or folder (.txt, .md)\n\n\nje.add(kb, text=...)\nAdd raw text\n\n\nje.add(kb, paths=[...])\nAdd multiple files\n\n\nje.add(kb, documents=[{\"text\": \"...\", \"filename\": \"...\"}])\nAdd from dicts\n\n\nje.add(..., max_tokens=300, merge_threshold=50)\nChunking options\n\n\nje.list_history()\nUpload history\n\n\n\n\n\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nje.query(text, kb=\"all\", top_k=5, min_score=0.0)\nSearch. kb = name, list of names, or \"all\"\n\n\n\nReturns list of dicts: {text, score, kb, file, chunk_index, model}."
+  },
+  {
+    "objectID": "reference.html#example",
+    "href": "reference.html#example",
+    "title": "API Reference",
+    "section": "Example",
+    "text": "Example\nimport justembed as je\n\nje.register_workspace(\"~/my_docs\")\nje.begin(workspace=\"~/my_docs\")\n\nje.create_kb(\"docs\")\nje.add(kb=\"docs\", path=\"report.txt\")\nresults = je.query(\"summary\", kb=\"docs\", top_k=5)"
+  },
+  {
+    "objectID": "reference.html#cli",
+    "href": "reference.html#cli",
+    "title": "API Reference",
+    "section": "CLI",
+    "text": "CLI\njustembed begin --workspace ~/docs [--port 5424] [--host 127.0.0.1]"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "JustEmbed",
+    "section": "",
+    "text": "JustEmbed (LENS — Language Embedder With No Synthesizer) is an offline-first tool for semantic search. It runs entirely on your machine: no cloud, no API keys, no GPU required.\n\nE5-Small: General-purpose 384-dim embeddings (ONNX)\nCustom models: Train domain-specific models (e.g. pyrexia ↔︎ fever) from your text\nKnowledge bases: Multiple KBs, each with its own model\nWeb UI & Python API: Use the browser or import justembed as je\n\nVersion: 0.1.1"
+  },
+  {
+    "objectID": "index.html#what-is-justembed",
+    "href": "index.html#what-is-justembed",
+    "title": "JustEmbed",
+    "section": "",
+    "text": "JustEmbed (LENS — Language Embedder With No Synthesizer) is an offline-first tool for semantic search. It runs entirely on your machine: no cloud, no API keys, no GPU required.\n\nE5-Small: General-purpose 384-dim embeddings (ONNX)\nCustom models: Train domain-specific models (e.g. pyrexia ↔︎ fever) from your text\nKnowledge bases: Multiple KBs, each with its own model\nWeb UI & Python API: Use the browser or import justembed as je\n\nVersion: 0.1.1"
+  },
+  {
+    "objectID": "index.html#for-non-technical-users",
+    "href": "index.html#for-non-technical-users",
+    "title": "JustEmbed",
+    "section": "For Non-Technical Users",
+    "text": "For Non-Technical Users\nUpload documents through the web interface and search by meaning. No coding required. See how your text is chunked and embedded at each step."
+  },
+  {
+    "objectID": "index.html#for-developers",
+    "href": "index.html#for-developers",
+    "title": "JustEmbed",
+    "section": "For Developers",
+    "text": "For Developers\nA simple Python API lets you experiment with embeddings locally before moving to production vector databases."
+  },
+  {
+    "objectID": "index.html#quick-start",
+    "href": "index.html#quick-start",
+    "title": "JustEmbed",
+    "section": "Quick Start",
+    "text": "Quick Start\npip install justembed\njustembed begin --workspace ~/my_documents\nOpen http://localhost:5424 in your browser."
+  },
+  {
+    "objectID": "index.html#links",
+    "href": "index.html#links",
+    "title": "JustEmbed",
+    "section": "Links",
+    "text": "Links\n\nGitHub\nPyPI\nGetting Started — Install and first run\nGuide — Concepts and workflows\nExamples — Medical demo and test queries\nAPI Reference — Python API"
+  },
+  {
+    "objectID": "getting-started.html",
+    "href": "getting-started.html",
+    "title": "Getting Started",
+    "section": "",
+    "text": "pip install justembed\nRequires Python 3.8+. No GPU needed."
+  },
+  {
+    "objectID": "getting-started.html#installation",
+    "href": "getting-started.html#installation",
+    "title": "Getting Started",
+    "section": "",
+    "text": "pip install justembed\nRequires Python 3.8+. No GPU needed."
+  },
+  {
+    "objectID": "getting-started.html#web-interface",
+    "href": "getting-started.html#web-interface",
+    "title": "Getting Started",
+    "section": "Web Interface",
+    "text": "Web Interface\n\nStart the server:\n\njustembed begin --workspace ~/my_documents\n\nOpen http://localhost:5424 in your browser.\nOn first run, the setup page asks you to choose a workspace folder. Pick or create a directory (e.g. ~/justembed_workspace).\nFrom the main page you can:\n\nCreate knowledge bases\nTrain custom models\nUpload documents (preview chunks, then embed)\nRun queries"
+  },
+  {
+    "objectID": "getting-started.html#python-api",
+    "href": "getting-started.html#python-api",
+    "title": "Getting Started",
+    "section": "Python API",
+    "text": "Python API\nimport justembed as je\n\n# Start server (registers workspace and opens app)\nje.begin(workspace=\"~/my_docs\", open_browser=True)\n\n# Or run in background (e.g. in a notebook)\nje.begin(workspace=\"~/my_docs\", background=True)\nThen use the Web UI at http://localhost:5424, or call the API:\nje.create_kb(\"my_kb\")\nje.add(kb=\"my_kb\", path=\"/path/to/document.txt\")\nresults = je.query(\"search term\", kb=\"my_kb\")"
+  },
+  {
+    "objectID": "getting-started.html#cli-options",
+    "href": "getting-started.html#cli-options",
+    "title": "Getting Started",
+    "section": "CLI Options",
+    "text": "CLI Options\njustembed begin --workspace ~/docs --port 5424 --host 127.0.0.1\n\n--workspace, -w: Path to workspace folder\n--port, -p: Port (default 5424)\n--host: Bind address (default 127.0.0.1)"
+  },
+  {
+    "objectID": "getting-started.html#next-steps",
+    "href": "getting-started.html#next-steps",
+    "title": "Getting Started",
+    "section": "Next Steps",
+    "text": "Next Steps\n\nGuide — Workspace, KBs, chunking, and models\nExamples — Medical demo and test queries"
+  },
+  {
+    "objectID": "guide.html",
+    "href": "guide.html",
+    "title": "Guide",
+    "section": "",
+    "text": "A workspace is a folder that holds all your data:\n\nkb/ — Knowledge bases (one DuckDB file per KB)\ncustom_models/ — Trained ONNX models\ndrop-in_models/ — Reserved for future use\n\nThe current workspace is stored in ~/.justembed/config.json. You can register multiple workspaces and switch between them in the Web UI.\n\n\n\nEach KB is a DuckDB file. When you create a KB you choose:\n\nE5-Small (default) — General-purpose 384-dim embeddings\nCustom model — A model you trained on your own text\n\nDifferent KBs can use different models.\n\n\n\nDocuments are split into chunks (default: max 300 tokens per chunk, merge threshold 50). Chunking is deterministic and structure-aware (paragraphs, headings). The Web UI shows a chunk preview before you embed.\n\n\n\n\nEach chunk is turned into a vector (embedding). Similar meaning → similar vectors.\nA query is embedded and compared to chunk embeddings (cosine similarity). Results are ranked by score (0.0–1.0)."
+  },
+  {
+    "objectID": "guide.html#core-concepts",
+    "href": "guide.html#core-concepts",
+    "title": "Guide",
+    "section": "",
+    "text": "A workspace is a folder that holds all your data:\n\nkb/ — Knowledge bases (one DuckDB file per KB)\ncustom_models/ — Trained ONNX models\ndrop-in_models/ — Reserved for future use\n\nThe current workspace is stored in ~/.justembed/config.json. You can register multiple workspaces and switch between them in the Web UI.\n\n\n\nEach KB is a DuckDB file. When you create a KB you choose:\n\nE5-Small (default) — General-purpose 384-dim embeddings\nCustom model — A model you trained on your own text\n\nDifferent KBs can use different models.\n\n\n\nDocuments are split into chunks (default: max 300 tokens per chunk, merge threshold 50). Chunking is deterministic and structure-aware (paragraphs, headings). The Web UI shows a chunk preview before you embed.\n\n\n\n\nEach chunk is turned into a vector (embedding). Similar meaning → similar vectors.\nA query is embedded and compared to chunk embeddings (cosine similarity). Results are ranked by score (0.0–1.0)."
+  },
+  {
+    "objectID": "guide.html#web-ui-flow",
+    "href": "guide.html#web-ui-flow",
+    "title": "Guide",
+    "section": "Web UI Flow",
+    "text": "Web UI Flow\n\nSetup — Choose workspace (first run).\nKnowledge bases — Create a KB, select E5 or a custom model.\nTrain model (optional) — Upload text, set name and options, train. Saves to workspace/custom_models/&lt;name&gt;/.\nUpload — Select file → Preview chunks → Apply chunking → Embed.\nQuery — Enter query, select KB(s), see ranked results with scores."
+  },
+  {
+    "objectID": "guide.html#custom-models",
+    "href": "guide.html#custom-models",
+    "title": "Guide",
+    "section": "Custom Models",
+    "text": "Custom Models\n\nTraining data: Use a text file (or folder of .txt/.md) that contains the vocabulary and concepts you care about (e.g. medical terms).\nResult: An ONNX model saved in workspace/custom_models/&lt;name&gt;/.\nLimitation: Custom models are lexical (TF-IDF + MLP). They only “know” words that appeared in the training text. For semantic links (e.g. “hot” → temperature when “hot” never appeared), use E5."
+  },
+  {
+    "objectID": "guide.html#file-locations",
+    "href": "guide.html#file-locations",
+    "title": "Guide",
+    "section": "File Locations",
+    "text": "File Locations\n\n\n\nItem\nLocation\n\n\n\n\nConfig\n~/.justembed/config.json\n\n\nE5 model\n~/.cache/justembed/\n\n\nCustom models\nworkspace/custom_models/\n\n\nKnowledge bases\nworkspace/kb/*.duckdb"
+  },
+  {
+    "objectID": "guide.html#requirements",
+    "href": "guide.html#requirements",
+    "title": "Guide",
+    "section": "Requirements",
+    "text": "Requirements\n\nPython 3.8+\n~500 MB disk, 1 GB RAM, CPU only\nOffline after install\n\nSee API Reference for the full Python API."
+  },
+  {
+    "objectID": "examples.html",
+    "href": "examples.html",
+    "title": "Examples",
+    "section": "",
+    "text": "JustEmbed ships with two example medical text files you can use to see how training and KB content work.\n\n\n\n\n\n\n\n\n\nFile\nUse\n\n\n\n\nmedical_embedding_demo.txt\nTraining the custom ONNX model (vocabulary)\n\n\nmedical_kb_documents.txt\nAdding to a KB (documents to search)\n\n\n\nPath (after install): inside the justembed package, e.g. justembed/examples/ (or copy from GitHub).\n\n\n\n\nTrain a custom model on medical_embedding_demo.txt (Web UI: Train Custom Model, or API: je.train_model(\"medical_demo\", \"path/to/medical_embedding_demo.txt\")).\nCreate a KB with that custom model (or use E5).\nAdd to KB the file medical_kb_documents.txt (Upload → Preview → Apply chunking → Embed).\nQuery with e.g. fever, paracetamol, neutropenia, febrile neutropenia, UTI.\n\n\n\n\n\nMax tokens: 300\n\nMerge threshold: 50\n\nSplit by headings and paragraphs\n\nmedical_embedding_demo.txt yields 7 chunks; medical_kb_documents.txt yields 4 chunks.\n\n\n\nCustom model (terms appear in training or KB text):\n\nfever, pyrexia, paracetamol, acetaminophen, neutropenia, febrile neutropenia, antipyretic\n\nE5 (semantic; can match concepts not literally in the text):\n\ntemperature regulation, low white blood cells, pain relief medicine, drug for fever"
+  },
+  {
+    "objectID": "examples.html#medical-embedding-demo",
+    "href": "examples.html#medical-embedding-demo",
+    "title": "Examples",
+    "section": "",
+    "text": "JustEmbed ships with two example medical text files you can use to see how training and KB content work.\n\n\n\n\n\n\n\n\n\nFile\nUse\n\n\n\n\nmedical_embedding_demo.txt\nTraining the custom ONNX model (vocabulary)\n\n\nmedical_kb_documents.txt\nAdding to a KB (documents to search)\n\n\n\nPath (after install): inside the justembed package, e.g. justembed/examples/ (or copy from GitHub).\n\n\n\n\nTrain a custom model on medical_embedding_demo.txt (Web UI: Train Custom Model, or API: je.train_model(\"medical_demo\", \"path/to/medical_embedding_demo.txt\")).\nCreate a KB with that custom model (or use E5).\nAdd to KB the file medical_kb_documents.txt (Upload → Preview → Apply chunking → Embed).\nQuery with e.g. fever, paracetamol, neutropenia, febrile neutropenia, UTI.\n\n\n\n\n\nMax tokens: 300\n\nMerge threshold: 50\n\nSplit by headings and paragraphs\n\nmedical_embedding_demo.txt yields 7 chunks; medical_kb_documents.txt yields 4 chunks.\n\n\n\nCustom model (terms appear in training or KB text):\n\nfever, pyrexia, paracetamol, acetaminophen, neutropenia, febrile neutropenia, antipyretic\n\nE5 (semantic; can match concepts not literally in the text):\n\ntemperature regulation, low white blood cells, pain relief medicine, drug for fever"
+  },
+  {
+    "objectID": "examples.html#python-snippet",
+    "href": "examples.html#python-snippet",
+    "title": "Examples",
+    "section": "Python Snippet",
+    "text": "Python Snippet\nimport justembed as je\n\nje.register_workspace(\"~/justembed_demo\")\nje.begin(workspace=\"~/justembed_demo\", background=True)\n\n# Train on vocabulary text\nje.train_model(\"medical_demo\", \"path/to/medical_embedding_demo.txt\")\n\n# Create KB and add documents to search\nje.create_kb(\"medical_kb\", model=\"medical_demo\")\nje.add(kb=\"medical_kb\", path=\"path/to/medical_kb_documents.txt\")\n\n# Query\nresults = je.query(\"paracetamol\", kb=\"medical_kb\", top_k=5)\nfor r in results:\n    print(f\"{r['score']:.3f} | {r['text'][:80]}...\")"
+  },
+  {
+    "objectID": "examples.html#understanding-results",
+    "href": "examples.html#understanding-results",
+    "title": "Examples",
+    "section": "Understanding Results",
+    "text": "Understanding Results\n\nScore: Cosine similarity (0.0–1.0). Higher = more similar to the query.\nCustom model: Best when query words appeared in the training or document text.\nE5: Can retrieve by meaning even when the exact query word is absent."
+  }
+]

@@ -1,0 +1,41 @@
+---
+title: "JustEmbed"
+subtitle: "Your First Step Into Semantic Search"
+---
+
+## What is JustEmbed?
+
+**JustEmbed** (LENS — Language Embedder With No Synthesizer) is an offline-first tool for **semantic search**. It runs entirely on your machine: no cloud, no API keys, no GPU required.
+
+- **E5-Small**: General-purpose 384-dim embeddings (ONNX)
+- **Custom models**: Train domain-specific models (e.g. pyrexia ↔ fever) from your text
+- **Knowledge bases**: Multiple KBs, each with its own model
+- **Web UI & Python API**: Use the browser or `import justembed as je`
+
+**Version:** 0.1.1
+
+## For Non-Technical Users
+
+Upload documents through the web interface and search by meaning. No coding required. See how your text is chunked and embedded at each step.
+
+## For Developers
+
+A simple Python API lets you experiment with embeddings locally before moving to production vector databases.
+
+## Quick Start
+
+```bash
+pip install justembed
+justembed begin --workspace ~/my_documents
+```
+
+Open http://localhost:5424 in your browser.
+
+## Links
+
+- [GitHub](https://github.com/sekarkrishna/justembed)
+- [PyPI](https://pypi.org/project/justembed/)
+- [Getting Started](getting-started.qmd) — Install and first run
+- [Guide](guide.qmd) — Concepts and workflows
+- [Examples](examples.qmd) — Medical demo and test queries
+- [API Reference](reference.qmd) — Python API

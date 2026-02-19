@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustEmbed - Embedding Complete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-2xl w-full mx-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="mb-6">
+                <svg class="w-20 h-20 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Embedding Complete!</h1>
+            <p class="text-gray-600 mb-8">Your documents have been successfully embedded and saved to the knowledge base.</p>
+
+            <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <div class="text-gray-500 mb-1">File</div>
+                        <div class="font-mono text-gray-900 truncate">{{ filename }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Knowledge Base</div>
+                        <div class="font-semibold text-blue-600">{{ kb }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Chunks Embedded</div>
+                        <div class="text-2xl font-bold text-green-600">{{ total_chunks }}</div>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">Model:</span> 
+                        {% if model_type == 'custom' %}
+                        <span class="text-purple-600">🎯 Custom: {{ model_name }}</span>
+                        {% else %}
+                        <span class="text-blue-600">🔤 E5-Small</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-8">
+                <div class="bg-green-500 h-3 rounded-full transition-all duration-500" style="width: 100%"></div>
+            </div>
+
+            <a href="/?tab=kbs&kb={{ kb }}" class="inline-block px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                Back to Knowledge Bases
+            </a>
+        </div>
+
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+            <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+            <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+            <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+        </footer>
+    </div>
+</body>
+</html>

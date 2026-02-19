@@ -1,0 +1,21 @@
+# Fever and Temperature
+
+Fever, also called pyrexia or hyperthermia, is a rise in body temperature above the normal range. It is one of the most common signs of infection or inflammation. Patients with fever often feel hot, flushed, and may have chills or sweating. In clinical practice, fever is usually defined as a temperature above 38°C when measured orally. Paracetamol, known as acetaminophen in some countries, is a first-line antipyretic used to lower fever and relieve discomfort. It works by acting on the hypothalamus to reduce the temperature set point.
+
+Body temperature is regulated by the hypothalamus in the brain. When pathogens or inflammatory signals are detected, cytokines can cause the hypothalamus to raise the set point, leading to fever. Antipyretics such as paracetamol and ibuprofen help bring the temperature down. In febrile patients, we often recommend paracetamol for fever control unless there are contraindications such as liver disease. Fever itself is not always harmful; it can help the immune system fight infection.
+
+# Neutropenia and Infection Risk
+
+Neutropenia means a low neutrophil count in the blood. Neutrophils are white blood cells that fight bacterial and fungal infections. When the absolute neutrophil count (ANC) drops below 1.5 × 10⁹/L, the patient is at increased risk of infection. Severe neutropenia, often defined as ANC below 0.5 × 10⁹/L, carries a high risk of serious bacterial infection and febrile neutropenia. Febrile neutropenia is a medical emergency: the patient has fever plus neutropenia and may need urgent antibiotics and sometimes hospital admission.
+
+Patients with febrile neutropenia often present with fever and sometimes no obvious focus of infection. Blood cultures and broad-spectrum antibiotics are started promptly. Paracetamol or acetaminophen may be given for fever relief while the cause is investigated. Chemotherapy is a common cause of neutropenia; cancer patients are monitored for low neutrophil counts. Growth factors such as G-CSF can be used to stimulate neutrophil production when appropriate.
+
+# Paracetamol and Pain Relief
+
+Paracetamol, also known as acetaminophen, is a widely used analgesic and antipyretic. It reduces fever and mild to moderate pain. Unlike NSAIDs, paracetamol has minimal anti-inflammatory effect and is generally safe for the stomach. The usual adult dose is 500 mg to 1000 mg every four to six hours, with a maximum daily dose (often 4 g, or 3 g in some guidelines) to avoid liver toxicity. Overdose can cause serious liver damage; N-acetylcysteine is the antidote.
+
+In patients with fever, paracetamol is often preferred when aspirin or NSAIDs are not suitable. It is commonly used in children for fever and pain. In the context of febrile neutropenia, paracetamol can be used for symptomatic fever control alongside antibiotics. Always check for liver disease or other contraindications before prescribing. Combining paracetamol with other products that contain it can lead to accidental overdose.
+
+# Summary: Key Terms and Relationships
+
+Fever (pyrexia, hyperthermia) is a sign of infection or inflammation and is managed with antipyretics such as paracetamol. Neutropenia increases the risk of infection; when fever occurs with neutropenia (febrile neutropenia), urgent treatment is needed. Paracetamol (acetaminophen) is used for fever and pain relief and must be dosed carefully to avoid liver harm. These concepts are linked: fever can occur in neutropenic patients, and paracetamol is a common choice for reducing fever in many clinical situations.

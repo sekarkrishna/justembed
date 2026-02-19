@@ -1,0 +1,64 @@
+---
+title: "Getting Started"
+---
+
+## Installation
+
+```bash
+pip install justembed
+```
+
+Requires Python 3.8+. No GPU needed.
+
+## Web Interface
+
+1. Start the server:
+
+```bash
+justembed begin --workspace ~/my_documents
+```
+
+2. Open **http://localhost:5424** in your browser.
+
+3. On first run, the setup page asks you to choose a workspace folder. Pick or create a directory (e.g. `~/justembed_workspace`).
+
+4. From the main page you can:
+   - Create knowledge bases
+   - Train custom models
+   - Upload documents (preview chunks, then embed)
+   - Run queries
+
+## Python API
+
+```python
+import justembed as je
+
+# Start server (registers workspace and opens app)
+je.begin(workspace="~/my_docs", open_browser=True)
+
+# Or run in background (e.g. in a notebook)
+je.begin(workspace="~/my_docs", background=True)
+```
+
+Then use the Web UI at http://localhost:5424, or call the API:
+
+```python
+je.create_kb("my_kb")
+je.add(kb="my_kb", path="/path/to/document.txt")
+results = je.query("search term", kb="my_kb")
+```
+
+## CLI Options
+
+```bash
+justembed begin --workspace ~/docs --port 5424 --host 127.0.0.1
+```
+
+- `--workspace`, `-w`: Path to workspace folder
+- `--port`, `-p`: Port (default 5424)
+- `--host`: Bind address (default 127.0.0.1)
+
+## Next Steps
+
+- [Guide](guide.qmd) — Workspace, KBs, chunking, and models
+- [Examples](examples.qmd) — Medical demo and test queries

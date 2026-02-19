@@ -1,0 +1,79 @@
+---
+title: "API Reference"
+---
+
+## Python API
+
+Use `import justembed as je`. Version 0.1.1.
+
+### Workspace
+
+| Function | Description |
+|----------|-------------|
+| `je.register_workspace(path)` | Register a workspace (does not delete data) |
+| `je.deregister_workspace(path, confirm=True)` | Remove from registry |
+| `je.list_workspaces()` | List registered workspaces |
+
+### Server
+
+| Function | Description |
+|----------|-------------|
+| `je.begin(workspace, port=5424, host="127.0.0.1")` | Start server (blocks) |
+| `je.begin(..., background=True)` | Start in background |
+| `je.begin(..., open_browser=True)` | Open browser after start |
+| `je.terminate(port)` | Stop server |
+| `je.list_servers()` | List active servers |
+
+### Models
+
+| Function | Description |
+|----------|-------------|
+| `je.train_model(name, training_data, embedding_dim=128, max_features=5000)` | Train custom model. `training_data` = file path or list of strings |
+| `je.list_models()` | List models (default E5 + custom) |
+| `je.delete_model(name, confirm=True)` | Delete custom model |
+
+### Knowledge Bases
+
+| Function | Description |
+|----------|-------------|
+| `je.create_kb(name, model="default")` | Create KB. `model` = `"default"` (E5) or custom model name |
+| `je.list_kbs()` | List KBs with model and chunk count |
+| `je.delete_kb(name, confirm=True)` | Delete KB |
+
+### Documents
+
+| Function | Description |
+|----------|-------------|
+| `je.add(kb, path=...)` | Add file or folder (.txt, .md) |
+| `je.add(kb, text=...)` | Add raw text |
+| `je.add(kb, paths=[...])` | Add multiple files |
+| `je.add(kb, documents=[{"text": "...", "filename": "..."}])` | Add from dicts |
+| `je.add(..., max_tokens=300, merge_threshold=50)` | Chunking options |
+| `je.list_history()` | Upload history |
+
+### Query
+
+| Function | Description |
+|----------|-------------|
+| `je.query(text, kb="all", top_k=5, min_score=0.0)` | Search. `kb` = name, list of names, or `"all"` |
+
+Returns list of dicts: `{text, score, kb, file, chunk_index, model}`.
+
+## Example
+
+```python
+import justembed as je
+
+je.register_workspace("~/my_docs")
+je.begin(workspace="~/my_docs")
+
+je.create_kb("docs")
+je.add(kb="docs", path="report.txt")
+results = je.query("summary", kb="docs", top_k=5)
+```
+
+## CLI
+
+```bash
+justembed begin --workspace ~/docs [--port 5424] [--host 127.0.0.1]
+```

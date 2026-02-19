@@ -1,0 +1,15 @@
+# Patient Case: Fever and UTI
+
+Mrs. Smith, aged 62, presented to the clinic with a three-day history of fever and burning on urination. She had been taking paracetamol at home with partial relief of the fever but persistent urinary symptoms. On examination she was febrile at 38.4°C. Urine dipstick was positive for leukocytes and nitrites. A diagnosis of urinary tract infection was made. She was started on antibiotics and advised to continue paracetamol for fever and discomfort. Follow-up in one week was arranged to confirm resolution.
+
+# Oncology Note: Febrile Neutropenia Protocol
+
+Mr. Jones is on chemotherapy for lymphoma and today has fever with a neutrophil count of 0.3. He is admitted under the febrile neutropenia protocol. Blood cultures are sent and he is started on broad-spectrum antibiotics. Paracetamol is prescribed for fever; we will avoid ibuprofen given thrombocytopenia. If his fever persists beyond 48 hours or he becomes unstable, we will consider adding antifungal coverage and reassessing for a focus of infection.
+
+# Discharge Summary: Fever of Unknown Origin
+
+The patient was admitted with five days of fever, fatigue, and night sweats. Investigations included blood cultures, serology, and imaging; no clear source was found. He improved with supportive care and regular paracetamol. Neutrophil count was normal throughout. He is discharged with advice to complete a course of paracetamol as needed for any recurrence of fever and to return if symptoms worsen. Outpatient follow-up is arranged with general medicine.
+
+# Pharmacy Note: Antipyretic Use in Children
+
+For paediatric fever, paracetamol (acetaminophen) is the preferred first-line antipyretic in most guidelines. Dosing is weight-based. Parents should be advised not to combine paracetamol with other over-the-counter cold remedies that may contain it, to avoid overdose. In children with fever and neutropenia, antipyretics can be used for comfort while infection is being treated; the underlying infection still requires appropriate antimicrobial therapy.

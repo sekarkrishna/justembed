@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustEmbed - Chunk Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/?tab=kbs" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Knowledge Bases
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Chunk Preview</h1>
+            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <span><strong>File:</strong> {{ filename }}</span>
+                <span><strong>KB:</strong> {{ kb }}</span>
+                <span><strong>Total Chunks:</strong> {{ chunks|length }}</span>
+            </div>
+        </div>
+
+        {% if file_exists %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6 rounded-lg shadow">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-yellow-800">File Already Exists</h3>
+                    <div class="mt-2 text-sm text-yellow-700">
+                        <p class="mb-2">
+                            <strong>Warning:</strong> A file named "{{ filename }}" already exists in this knowledge base with {{ existing_chunk_count }} chunk(s).
+                        </p>
+                        <p class="mb-2">
+                            If you continue, the existing chunks will be <strong>deleted and replaced</strong> with the new {{ chunks|length }} chunk(s).
+                        </p>
+                        <p class="font-medium">
+                            💡 Tip: If you want to keep both versions, rename the file before uploading (e.g., "{{ filename.rsplit('.', 1)[0] }}_v2.{{ filename.rsplit('.', 1)[1] if '.' in filename else 'txt' }}").
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Chunking Options</h2>
+            <form method="post" action="/preview-chunks-ui" class="space-y-4">
+                <input type="hidden" name="cache_key" value="{{ cache_key }}">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <input type="hidden" name="kb" value="{{ kb }}">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Max Tokens</label>
+                        <input type="number" name="max_tokens" value="{{ max_tokens }}" min="10" max="800"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Merge Threshold</label>
+                        <input type="number" name="merge_threshold" value="{{ merge_threshold }}" min="10" max="100"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="split_by_headings" {% if split_by_headings %}checked{% endif %}
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Split by Headings</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="split_by_paragraphs" {% if split_by_paragraphs %}checked{% endif %}
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Split by Paragraphs</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                    Re-Preview with New Settings
+                </button>
+            </form>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Chunks Preview</h2>
+        <div class="space-y-4 mb-6">
+            {% for chunk in chunks %}
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-semibold text-gray-700">Chunk {{ chunk.chunk_index + 1 }}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">{{ chunk.token_count }} tokens</span>
+                </div>
+                <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ chunk.text }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <form method="post" action="/apply-chunking" class="flex space-x-4" id="applyForm" onsubmit="showProgress()">
+                <input type="hidden" name="cache_key" value="{{ cache_key }}">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <input type="hidden" name="kb" value="{{ kb }}">
+                <input type="hidden" name="max_tokens" value="{{ max_tokens }}">
+                <input type="hidden" name="merge_threshold" value="{{ merge_threshold }}">
+                <input type="hidden" name="split_by_headings" value="{{ split_by_headings }}">
+                <input type="hidden" name="split_by_paragraphs" value="{{ split_by_paragraphs }}">
+                <button type="submit" id="applyBtn" class="flex-1 px-6 py-3 {% if file_exists %}bg-orange-600 hover:bg-orange-700{% else %}bg-blue-600 hover:bg-blue-700{% endif %} text-white rounded-md transition-colors font-medium">
+                    {% if file_exists %}
+                    ⚠️ Replace Existing & Save to KB
+                    {% else %}
+                    ✓ Apply Chunking (Save to KB)
+                    {% endif %}
+                </button>
+                <a href="/?tab=kbs" class="px-6 py-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors font-medium">
+                    Cancel
+                </a>
+            </form>
+            
+            <!-- Progress indicator (hidden by default) -->
+            <div id="progressIndicator" class="hidden mt-4">
+                <div class="flex items-center justify-center space-x-3">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <div class="text-gray-700">
+                        <p class="font-medium">Processing chunks...</p>
+                        <p class="text-sm text-gray-500">Saving {{ chunks|length }} chunks to KB and preparing for embedding</p>
+                    </div>
+                </div>
+                <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full animate-pulse" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function showProgress() {
+                // Hide the form buttons
+                document.getElementById('applyBtn').disabled = true;
+                document.getElementById('applyBtn').classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('applyBtn').textContent = 'Processing...';
+                
+                // Show progress indicator
+                document.getElementById('progressIndicator').classList.remove('hidden');
+            }
+        </script>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+                <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+                <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+                <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

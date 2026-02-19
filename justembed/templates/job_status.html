@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Status - JustEmbed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Job Status</h1>
+                <a href="/jobs" class="text-sm text-blue-600 hover:text-blue-800">View All Jobs</a>
+            </div>
+            
+            <!-- Job Info -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Job ID:</span>
+                        <span class="ml-2 font-mono text-xs">{{ job.job_id }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Type:</span>
+                        <span class="ml-2 font-semibold">
+                            {% if job.job_type == 'train_model' %}
+                            🧠 Model Training
+                            {% elif job.job_type == 'embed_chunks' %}
+                            📊 Embedding Chunks
+                            {% else %}
+                            {{ job.job_type }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Created:</span>
+                        <span class="ml-2">{{ job.created_at[:19].replace('T', ' ') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Status:</span>
+                        <span id="status-badge" class="ml-2 px-2 py-1 rounded text-xs font-semibold
+                            {% if job.status == 'complete' %}bg-green-100 text-green-800
+                            {% elif job.status == 'failed' %}bg-red-100 text-red-800
+                            {% elif job.status == 'running' %}bg-blue-100 text-blue-800
+                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ job.status.upper() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div id="progress-section" class="mb-6 {% if job.status in ['complete', 'failed'] %}hidden{% endif %}">
+                <div class="flex justify-between mb-2">
+                    <span id="message" class="text-sm text-gray-700">{{ job.message or 'Processing...' }}</span>
+                    <span id="progress-percent" class="text-sm font-semibold text-gray-900">{{ job.progress }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progress-bar" 
+                         class="bg-blue-600 h-4 rounded-full transition-all duration-300"
+                         style="width: {{ job.progress }}%"></div>
+                </div>
+                
+                <!-- Spinner -->
+                <div class="flex justify-center mt-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+            </div>
+            
+            <!-- Success Result -->
+            <div id="success-section" class="{% if job.status != 'complete' %}hidden{% endif %}">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-green-900">Job Completed Successfully!</h2>
+                    </div>
+                    
+                    {% if job.result %}
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Result:</h3>
+                        <div class="bg-white rounded p-3 text-sm">
+                            {% if job.job_type == 'train_model' %}
+                            <p class="mb-2">✅ Model <span class="font-mono font-semibold">{{ job.result.model_name }}</span> trained successfully!</p>
+                            <p class="text-gray-600 text-xs">Saved to: {{ job.result.model_dir }}</p>
+                            {% elif job.job_type == 'embed_chunks' %}
+                            <p class="mb-2">✅ Embedded <span class="font-semibold">{{ job.result.total_chunks }}</span> chunks</p>
+                            <p class="text-gray-600 text-xs">KB: {{ job.result.kb_name }} | File: {{ job.result.filename }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="flex space-x-3">
+                        <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Go to Home
+                        </a>
+                        {% if job.job_type == 'train_model' %}
+                        <a href="/?tab=models" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            View Models
+                        </a>
+                        {% elif job.job_type == 'embed_chunks' %}
+                        <a href="/?tab=kbs" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            View Knowledge Bases
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Result -->
+            <div id="error-section" class="{% if job.status != 'failed' %}hidden{% endif %}">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 class="text-xl font-semibold text-red-900">Job Failed</h2>
+                    </div>
+                    
+                    {% if job.error %}
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Error:</h3>
+                        <div class="bg-white rounded p-3 text-sm text-red-700 font-mono">
+                            {{ job.error }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="flex space-x-3">
+                        <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Go to Home
+                        </a>
+                        {% if job.job_type == 'train_model' %}
+                        <a href="/train-model" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            Try Again
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+                <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+                <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+                <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const jobId = "{{ job.job_id }}";
+        let pollInterval;
+        
+        // Poll for job status updates
+        function pollJobStatus() {
+            fetch(`/api/jobs/${jobId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update progress
+                    document.getElementById('progress-bar').style.width = data.progress + '%';
+                    document.getElementById('progress-percent').textContent = data.progress + '%';
+                    document.getElementById('message').textContent = data.message || 'Processing...';
+                    
+                    // Update status badge
+                    const badge = document.getElementById('status-badge');
+                    badge.textContent = data.status.toUpperCase();
+                    badge.className = 'ml-2 px-2 py-1 rounded text-xs font-semibold';
+                    
+                    if (data.status === 'complete') {
+                        badge.className += ' bg-green-100 text-green-800';
+                        clearInterval(pollInterval);
+                        document.getElementById('progress-section').classList.add('hidden');
+                        document.getElementById('success-section').classList.remove('hidden');
+                        
+                        // Auto-redirect after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 3000);
+                    } else if (data.status === 'failed') {
+                        badge.className += ' bg-red-100 text-red-800';
+                        clearInterval(pollInterval);
+                        document.getElementById('progress-section').classList.add('hidden');
+                        document.getElementById('error-section').classList.remove('hidden');
+                    } else if (data.status === 'running') {
+                        badge.className += ' bg-blue-100 text-blue-800';
+                    } else {
+                        badge.className += ' bg-yellow-100 text-yellow-800';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error polling job status:', error);
+                });
+        }
+        
+        // Start polling if job is not complete
+        const initialStatus = "{{ job.status }}";
+        if (initialStatus !== 'complete' && initialStatus !== 'failed') {
+            pollInterval = setInterval(pollJobStatus, 1000);  // Poll every second
+        }
+    </script>
+</body>
+</html>

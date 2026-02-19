@@ -1,0 +1,9 @@
+Credit risk refers to the possibility that a borrower may fail to repay a loan or meet contractual obligations. Banks evaluate credit risk by examining income stability, repayment history, and the borrower's overall financial health. A higher credit risk often leads to increased interest rates to compensate for potential losses.
+
+Liquidity describes how quickly an asset can be converted into cash without significantly affecting its market price. Government bonds are considered highly liquid, while real estate is far less liquid due to longer selling periods. Financial institutions maintain liquidity buffers to handle unexpected cash demands.
+
+Interest rates play a central role in economic activity. When central banks raise policy rates, borrowing becomes more expensive, which slows down spending and investment. Conversely, lower interest rates stimulate economic growth by making credit more accessible to households and businesses.
+
+Inflation measures the rate at which the general price level of goods and services increases over time. Moderate inflation is normal in a growing economy, but high inflation erodes purchasing power. Central banks often adjust interest rates to keep inflation within a target range.
+
+Monetary policy is the set of actions taken by a central bank to influence money supply and economic conditions. Tools such as open market operations, reserve requirements, and policy rate adjustments help stabilize inflation, manage liquidity, and support sustainable economic growth.

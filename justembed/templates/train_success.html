@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustEmbed - Training Complete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+            <div class="flex items-center">
+                <svg class="w-12 h-12 text-green-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <h1 class="text-2xl font-bold text-green-900">Training Complete!</h1>
+                    <p class="text-green-700">Model "{{ model_name }}" is ready to use</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Model Statistics</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-sm text-blue-600 mb-1">Embedding Dimension</div>
+                    <div class="text-3xl font-bold text-blue-900">{{ config.embedding_dim }}</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-sm text-green-600 mb-1">Training Chunks</div>
+                    <div class="text-3xl font-bold text-green-900">{{ config.corpus_stats.num_chunks }}</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-sm text-purple-600 mb-1">Total Words</div>
+                    <div class="text-3xl font-bold text-purple-900">{{ config.corpus_stats.num_words }}</div>
+                </div>
+                <div class="bg-orange-50 rounded-lg p-4">
+                    <div class="text-sm text-orange-600 mb-1">Unique Terms</div>
+                    <div class="text-3xl font-bold text-orange-900">{{ config.corpus_stats.num_unique_terms }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Model Location</h2>
+            <div class="bg-gray-50 rounded p-4 font-mono text-sm">
+                <div class="text-gray-600 mb-2">{{ model_dir }}</div>
+                <div class="ml-4 space-y-1 text-gray-700">
+                    <div>├── model.onnx <span class="text-gray-500">(~8 MB)</span></div>
+                    <div>└── config.json <span class="text-gray-500">(metadata)</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">How to Use Your Model</h2>
+            <div class="bg-gray-900 rounded-lg p-6 overflow-x-auto">
+                <pre class="text-green-400 text-sm"><code><span class="text-gray-500"># Load your custom model</span>
+from justembed.embedder import CustomEmbedder
+import numpy as np
+
+embedder = CustomEmbedder("{{ model_name }}")
+
+<span class="text-gray-500"># Embed documents</span>
+docs = ["your document text here"]
+doc_embeddings = embedder.embed(docs)
+
+<span class="text-gray-500"># Embed query</span>
+query = "your search query"
+query_embedding = embedder.embed_query(query)
+
+<span class="text-gray-500"># Compute similarity</span>
+similarities = [
+    np.dot(query_embedding, doc_emb)
+    for doc_emb in doc_embeddings
+]</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Next Steps</h2>
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <div class="font-medium text-gray-900">Create a Knowledge Base</div>
+                        <div class="text-sm text-gray-600">Use your custom model when creating a new KB</div>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <div class="font-medium text-gray-900">Test Synonym Learning</div>
+                        <div class="text-sm text-gray-600">Query with domain-specific terms to see synonym matching</div>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <div class="font-medium text-gray-900">Train More Models</div>
+                        <div class="text-sm text-gray-600">Create specialized models for different domains</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-4">
+            <a href="/?tab=models" class="flex-1 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors font-medium text-center">
+                Back to Models
+            </a>
+            <a href="/?tab=kbs" class="flex-1 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-center">
+                Add KB Now
+            </a>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+                <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+                <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+                <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

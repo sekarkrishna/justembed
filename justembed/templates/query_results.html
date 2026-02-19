@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustEmbed - Query Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .explanation { display: none; }
+        .explanation.show { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Query Results</h1>
+            <p class="text-gray-600">Query: <span class="font-semibold">"{{ query }}"</span></p>
+        </div>
+
+        {% if mode == "count" %}
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-blue-900 mb-4">Total Matches: {{ total }}</h2>
+            <div class="space-y-2">
+                {% for r in by_kb %}
+                <div class="bg-white p-4 rounded-md border border-blue-100">
+                    <span class="font-semibold text-gray-900">{{ r.kb }}:</span>
+                    <span class="text-blue-700">{{ r.count }} matches</span>
+                    <span class="text-xs text-gray-500 ml-2">({{ r.model }})</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p class="text-green-800 font-semibold">Found {{ count }} results</p>
+        </div>
+
+        <!-- KB Filter Buttons -->
+        {% if results|length > 0 %}
+        {% set kb_counts = {} %}
+        {% for r in results %}
+            {% set _ = kb_counts.__setitem__(r.kb, kb_counts.get(r.kb, 0) + 1) %}
+        {% endfor %}
+        
+        {% if kb_counts.keys()|list|length > 1 %}
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <p class="text-sm text-gray-600 mb-3">Filter by Knowledge Base:</p>
+            <div class="flex flex-wrap gap-2">
+                {% for kb_name in kb_counts.keys()|sort %}
+                <button onclick="toggleKbFilter('{{ kb_name }}')" 
+                        id="filter-{{ kb_name }}"
+                        class="kb-filter-btn px-4 py-2 rounded-md font-medium text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600">
+                    {{ kb_name }} [{{ kb_counts[kb_name] }}]
+                </button>
+                {% endfor %}
+                <button onclick="showAllKbs()" 
+                        class="px-4 py-2 rounded-md font-medium text-sm transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Show All
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div class="space-y-4">
+            {% for r in results %}
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500 result-card" data-kb="{{ r.kb }}">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">{{ r.kb }}</span>
+                            <span class="text-sm text-gray-600 font-mono">{{ r.file }}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500">{{ r.model }}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        {% if r.score >= 0.9 %}
+                        <div class="text-2xl font-bold text-green-600">{{ "%.3f"|format(r.score) }}</div>
+                        <div class="text-xs text-green-600">🟢 Excellent</div>
+                        {% elif r.score >= 0.7 %}
+                        <div class="text-2xl font-bold text-yellow-600">{{ "%.3f"|format(r.score) }}</div>
+                        <div class="text-xs text-yellow-600">🟡 Good</div>
+                        {% elif r.score >= 0.5 %}
+                        <div class="text-2xl font-bold text-orange-600">{{ "%.3f"|format(r.score) }}</div>
+                        <div class="text-xs text-orange-600">🟠 Moderate</div>
+                        {% else %}
+                        <div class="text-2xl font-bold text-red-600">{{ "%.3f"|format(r.score) }}</div>
+                        <div class="text-xs text-red-600">🔴 Weak</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="text-gray-700 leading-relaxed mb-3">
+                    {{ r.text[:400] }}{% if r.text|length > 400 %}<span class="text-gray-400">...</span>{% endif %}
+                </div>
+                
+                <!-- Explanation Toggle Button -->
+                {% if r.explanation %}
+                <button onclick="toggleExplanation({{ loop.index }})" 
+                        class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                    <span id="icon-{{ loop.index }}" class="mr-1">+</span>
+                    <span>Why this matched</span>
+                </button>
+                
+                <!-- Explanation Section (Hidden by default) -->
+                <div id="explanation-{{ loop.index }}" class="explanation mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 class="font-semibold text-gray-900 mb-3">✓ Match Explanation</h4>
+                    
+                    <!-- Score Interpretation -->
+                    <div class="mb-4">
+                        {% if r.score >= 0.9 %}
+                        <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                            🟢 Excellent match ({{ "%.3f"|format(r.score) }})
+                        </span>
+                        <p class="text-sm text-gray-600 mt-2">Very high semantic similarity - meanings are nearly identical</p>
+                        {% elif r.score >= 0.7 %}
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                            🟡 Good match ({{ "%.3f"|format(r.score) }})
+                        </span>
+                        <p class="text-sm text-gray-600 mt-2">High semantic similarity - meanings are very close</p>
+                        {% elif r.score >= 0.5 %}
+                        <span class="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
+                            🟠 Moderate match ({{ "%.3f"|format(r.score) }})
+                        </span>
+                        <p class="text-sm text-gray-600 mt-2">Moderate semantic similarity - related concepts</p>
+                        {% else %}
+                        <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full">
+                            🔴 Weak match ({{ "%.3f"|format(r.score) }})
+                        </span>
+                        <p class="text-sm text-gray-600 mt-2">Low semantic similarity - loosely related or unrelated</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Term Analysis (Custom Models Only) -->
+                    {% if r.explanation.model_type == 'custom' and r.explanation.query_terms %}
+                    <div class="mb-4 p-3 bg-blue-50 rounded border border-blue-100">
+                        <p class="font-semibold text-sm text-gray-900 mb-2">🔍 Top Contributing Terms ({{ r.explanation.model_name }} model):</p>
+                        
+                        <div class="mb-3 p-2 bg-blue-100 rounded">
+                            <p class="text-xs text-blue-900 font-semibold mb-1">ℹ️ Custom TF-IDF Model:</p>
+                            <ul class="text-xs text-blue-800 space-y-1">
+                                <li>✅ Each dimension = word/bigram from training corpus</li>
+                                <li>✅ TF-IDF scores show term importance</li>
+                                <li>✅ Higher scores = more distinctive/relevant terms</li>
+                                <li>✅ Exact words that matched are highlighted below</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="text-xs text-gray-600 mb-1">Query "{{ query }}" - Top terms with TF-IDF scores:</p>
+                            <ul class="space-y-1">
+                            {% for term, score in r.explanation.query_terms %}
+                                <li class="text-sm">
+                                    <span class="font-mono text-blue-700 font-semibold">{{ term }}</span>
+                                    <span class="text-gray-500">(TF-IDF: {{ "%.2f"|format(score) }})</span>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="text-xs text-gray-600 mb-1">Result text snippet - Top terms with TF-IDF scores:</p>
+                            <ul class="space-y-1">
+                            {% for term, score in r.explanation.chunk_terms %}
+                                <li class="text-sm">
+                                    <span class="font-mono text-green-700 font-semibold">{{ term }}</span>
+                                    <span class="text-gray-500">(TF-IDF: {{ "%.2f"|format(score) }})</span>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <!-- Term Overlap Detection -->
+                        {% set query_term_set = [] %}
+                        {% for term, score in r.explanation.query_terms %}
+                            {% set _ = query_term_set.append(term) %}
+                        {% endfor %}
+                        
+                        {% set chunk_term_set = [] %}
+                        {% for term, score in r.explanation.chunk_terms %}
+                            {% set _ = chunk_term_set.append(term) %}
+                        {% endfor %}
+                        
+                        {% set overlapping_terms = [] %}
+                        {% for term in query_term_set %}
+                            {% if term in chunk_term_set %}
+                                {% set _ = overlapping_terms.append(term) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if overlapping_terms|length > 0 %}
+                        <div class="mt-3 p-2 bg-green-50 rounded border border-green-200">
+                            <p class="text-xs font-semibold text-green-800 mb-1">✅ Exact Words That Matched:</p>
+                            <p class="text-sm">
+                                {% for term in overlapping_terms %}
+                                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-mono mr-1 mb-1 font-semibold">{{ term }}</span>
+                                {% endfor %}
+                            </p>
+                            <p class="text-xs text-green-700 mt-1 italic">
+                                → Custom model learned these terms are related!
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="mt-3 p-2 bg-yellow-50 rounded border border-yellow-200">
+                            <p class="text-xs font-semibold text-yellow-800 mb-1">⚠️ No Direct Word Overlap</p>
+                            <p class="text-xs text-yellow-700 italic">
+                                Match is based on semantic similarity in embedding space, not exact word matches
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        <p class="text-xs text-gray-600 mt-2 italic">
+                            💡 Custom model uses TF-IDF vectorization: Each of {{ r.explanation.embedding_dim }} dimensions represents a unique word/bigram
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Dimension Browser (MOVED TO TOP) -->
+                    <div class="mb-4 p-3 bg-indigo-50 rounded border border-indigo-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="font-semibold text-sm text-gray-900">🔍 Dimension Browser</p>
+                            <p class="text-xs text-gray-600">Explore all {{ r.explanation.embedding_dim }} dimensions</p>
+                        </div>
+                        
+                        {% if r.explanation.model_type == 'custom' %}
+                        <div class="mb-3 p-2 bg-indigo-100 rounded">
+                            <p class="text-xs text-indigo-900 font-semibold">✅ Custom Model Feature:</p>
+                            {% if r.explanation.vocabulary %}
+                            <p class="text-xs text-indigo-800">Each dimension shows the exact word/bigram it represents with TF-IDF scores</p>
+                            {% else %}
+                            <p class="text-xs text-indigo-800">This model was trained without vocabulary metadata. Retrain the model to see word/bigram names for each dimension.</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                            
+                        <!-- Browser Controls -->
+                        <div class="flex items-center justify-center space-x-3 mb-3">
+                            <button onclick="browseDimensions({{ loop.index }}, -3)" 
+                                    id="prev-btn-{{ loop.index }}"
+                                    class="px-3 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                ← Previous 3
+                            </button>
+                            <span id="dim-range-{{ loop.index }}" class="text-xs font-mono text-gray-700">
+                                Dimensions 1-3
+                            </span>
+                            <button onclick="browseDimensions({{ loop.index }}, 3)" 
+                                    id="next-btn-{{ loop.index }}"
+                                    class="px-3 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                Next 3 →
+                            </button>
+                        </div>
+                        
+                        <!-- Dimension Display Area -->
+                        <div id="dim-display-{{ loop.index }}" class="space-y-2 font-mono text-xs">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-3 text-center italic">
+                            Educational feature: Scroll through all dimensions to understand embedding space
+                        </p>
+                        
+                        <p class="text-xs text-gray-600 mt-2 text-center">
+                            Full dimension: {{ r.explanation.embedding_dim }} | Blue = positive, Red = negative
+                        </p>
+                    </div>
+                    
+                    <!-- Overall Vector Alignment -->
+                    <div class="mb-4 p-3 bg-purple-50 rounded border border-purple-200">
+                        <p class="font-semibold text-sm text-gray-900 mb-2">📊 Overall Vector Alignment:</p>
+                        {% set query_emb = r.explanation.query_embedding_preview %}
+                        {% set chunk_emb = r.explanation.chunk_embedding_preview %}
+                        {% set same_sign_count = 0 %}
+                        {% set total_diff = 0 %}
+                        
+                        {% for i in range(3) %}
+                        {% if i < query_emb|length and i < chunk_emb|length %}
+                            {% set diff = ((query_emb[i] - chunk_emb[i])|abs) %}
+                            {% if (query_emb[i] >= 0 and chunk_emb[i] >= 0) or (query_emb[i] < 0 and chunk_emb[i] < 0) %}
+                            {% set same_sign_count = same_sign_count + 1 %}
+                            {% endif %}
+                            {% set total_diff = total_diff + diff %}
+                        {% endif %}
+                        {% endfor %}
+                        
+                        <div class="space-y-1 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Direction match:</span>
+                                <span class="font-semibold {% if same_sign_count >= 2 %}text-green-600{% else %}text-yellow-600{% endif %}">
+                                    {{ "%.0f"|format((same_sign_count / 3.0) * 100) }}% ({{ same_sign_count }}/3 dimensions same sign)
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Magnitude match:</span>
+                                {% set mag_match = (1 - (total_diff / 3.0)) * 100 %}
+                                <span class="font-semibold {% if mag_match >= 85 %}text-green-600{% elif mag_match >= 70 %}text-yellow-600{% else %}text-orange-600{% endif %}">
+                                    {{ "%.0f"|format(mag_match) }}% (bars similar length)
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Combined score:</span>
+                                <span class="font-semibold {% if r.score >= 0.7 %}text-green-600{% elif r.score >= 0.5 %}text-yellow-600{% else %}text-orange-600{% endif %}">
+                                    {{ "%.3f"|format(r.score) }} 
+                                    {% if r.score >= 0.7 %}(Good match){% elif r.score >= 0.5 %}(Moderate match){% else %}(Weak match){% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Most Aligned Dimensions -->
+                    {% if r.explanation.most_aligned and r.explanation.most_aligned|length > 0 %}
+                    <div class="mb-4 p-3 bg-green-50 rounded border border-green-200">
+                        <p class="font-semibold text-sm text-gray-900 mb-3">🟢 Top 3 Most Aligned Dimensions:</p>
+                        <div class="space-y-2 font-mono text-xs">
+                            {% for dim_info in r.explanation.most_aligned %}
+                            <div class="bg-white p-2 rounded border border-green-200">
+                                <p class="text-gray-500 text-xs mb-1">
+                                    Dimension {{ dim_info.dim + 1 }}:
+                                    {% if r.explanation.model_type == 'custom' and r.explanation.vocabulary and dim_info.dim < (r.explanation.vocabulary|length) %}
+                                    <span class="text-green-700 font-semibold">"{{ r.explanation.vocabulary[dim_info.dim] }}"</span>
+                                    {% endif %}
+                                </p>
+                                
+                                {% if r.explanation.model_type == 'custom' %}
+                                <p class="text-xs text-green-600 mb-1">TF-IDF scores for this word/bigram:</p>
+                                {% endif %}
+                                
+                                <!-- Query -->
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="w-12 text-gray-600 text-xs">Query:</span>
+                                    <span class="w-16 {% if dim_info.query_val >= 0 %}text-blue-700{% else %}text-red-700{% endif %} text-right">{{ "%.3f"|format(dim_info.query_val) }}</span>
+                                    <span class="{% if dim_info.query_val >= 0 %}text-blue-600{% else %}text-red-600{% endif %}">{{ '[' }}{% for _ in range((dim_info.query_val * 10)|int|abs) %}█{% endfor %}{% for _ in range(10 - (dim_info.query_val * 10)|int|abs) %}░{% endfor %}{{ ']' }}</span>
+                                </div>
+                                
+                                <!-- Result -->
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-12 text-gray-600 text-xs">Result:</span>
+                                    <span class="w-16 {% if dim_info.chunk_val >= 0 %}text-blue-700{% else %}text-red-700{% endif %} text-right">{{ "%.3f"|format(dim_info.chunk_val) }}</span>
+                                    <span class="{% if dim_info.chunk_val >= 0 %}text-blue-600{% else %}text-red-600{% endif %}">{{ '[' }}{% for _ in range((dim_info.chunk_val * 10)|int|abs) %}█{% endfor %}{% for _ in range(10 - (dim_info.chunk_val * 10)|int|abs) %}░{% endfor %}{{ ']' }}</span>
+                                    <span class="text-green-600 text-xs font-semibold">↑ Nearly identical! (Δ={{ "%.3f"|format(dim_info.diff) }})</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Most Divergent Dimensions -->
+                    {% if r.explanation.most_divergent and r.explanation.most_divergent|length > 0 %}
+                    <div class="mb-4 p-3 bg-red-50 rounded border border-red-200">
+                        <p class="font-semibold text-sm text-gray-900 mb-3">🔴 Most Divergent Dimensions:</p>
+                        <div class="space-y-2 font-mono text-xs">
+                            {% for dim_info in r.explanation.most_divergent %}
+                            <div class="bg-white p-2 rounded border border-red-200">
+                                <p class="text-gray-500 text-xs mb-1">
+                                    Dimension {{ dim_info.dim + 1 }}:
+                                    {% if r.explanation.model_type == 'custom' and r.explanation.vocabulary and dim_info.dim < (r.explanation.vocabulary|length) %}
+                                    <span class="text-red-700 font-semibold">"{{ r.explanation.vocabulary[dim_info.dim] }}"</span>
+                                    {% endif %}
+                                </p>
+                                
+                                {% if r.explanation.model_type == 'custom' %}
+                                <p class="text-xs text-red-600 mb-1">TF-IDF scores for this word/bigram:</p>
+                                {% endif %}
+                                
+                                <!-- Query -->
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="w-12 text-gray-600 text-xs">Query:</span>
+                                    <span class="w-16 {% if dim_info.query_val >= 0 %}text-blue-700{% else %}text-red-700{% endif %} text-right">{{ "%.3f"|format(dim_info.query_val) }}</span>
+                                    <span class="{% if dim_info.query_val >= 0 %}text-blue-600{% else %}text-red-600{% endif %}">{{ '[' }}{% for _ in range((dim_info.query_val * 10)|int|abs) %}█{% endfor %}{% for _ in range(10 - (dim_info.query_val * 10)|int|abs) %}░{% endfor %}{{ ']' }}</span>
+                                </div>
+                                
+                                <!-- Result -->
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-12 text-gray-600 text-xs">Result:</span>
+                                    <span class="w-16 {% if dim_info.chunk_val >= 0 %}text-blue-700{% else %}text-red-700{% endif %} text-right">{{ "%.3f"|format(dim_info.chunk_val) }}</span>
+                                    <span class="{% if dim_info.chunk_val >= 0 %}text-blue-600{% else %}text-red-600{% endif %}">{{ '[' }}{% for _ in range((dim_info.chunk_val * 10)|int|abs) %}█{% endfor %}{% for _ in range(10 - (dim_info.chunk_val * 10)|int|abs) %}░{% endfor %}{{ ']' }}</span>
+                                    
+                                    {% if not dim_info.same_sign %}
+                                    <span class="text-red-600 text-xs font-semibold">↑ Opposite signs!</span>
+                                    {% else %}
+                                    <span class="text-orange-600 text-xs font-semibold">↑ Large difference!</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Similarity Explanation -->
+                    <div class="p-3 bg-green-50 rounded border border-green-100">
+                        <p class="text-sm text-gray-900 mb-1">
+                            <span class="font-semibold">📐 Cosine Similarity</span> = dot product of normalized vectors
+                        </p>
+                        <p class="text-xs text-gray-600">
+                            Scores range from 0 (unrelated) to 1 (identical). Higher scores mean more similar meanings.
+                        </p>
+                        <p class="text-xs text-gray-600 mt-1">
+                            {% if r.explanation.model_type == 'custom' %}
+                            This custom model ({{ r.explanation.model_name }}) was trained on domain-specific text.
+                            {% else %}
+                            Using E5-Small general-purpose model (384 dimensions).
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+                <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+                <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+                <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Store embedding data for each result
+        const embeddingData = {};
+        
+        {% for r in results %}
+        {% if r.explanation %}
+        embeddingData[{{ loop.index }}] = {
+            queryEmb: {{ r.explanation.query_embedding_full|tojson }},
+            chunkEmb: {{ r.explanation.chunk_embedding_full|tojson }},
+            currentStart: 0,
+            totalDims: {{ r.explanation.embedding_dim }},
+            modelType: "{{ r.explanation.model_type }}",
+            {% if r.explanation.vocabulary %}
+            vocabulary: {{ r.explanation.vocabulary|tojson }}
+            {% else %}
+            vocabulary: null
+            {% endif %}
+        };
+        {% endif %}
+        {% endfor %}
+        
+        // Initialize dimension browsers on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize KB filters
+            document.querySelectorAll('.kb-filter-btn').forEach(btn => {
+                const kbName = btn.id.replace('filter-', '');
+                activeKbFilters.add(kbName);
+            });
+            
+            // Initialize dimension browsers
+            Object.keys(embeddingData).forEach(idx => {
+                renderDimensions(parseInt(idx), 0);
+            });
+        });
+        
+        // Render dimensions for a specific range
+        function renderDimensions(resultIdx, startIdx) {
+            const data = embeddingData[resultIdx];
+            if (!data) return;
+            
+            const displayArea = document.getElementById(`dim-display-${resultIdx}`);
+            const rangeLabel = document.getElementById(`dim-range-${resultIdx}`);
+            const prevBtn = document.getElementById(`prev-btn-${resultIdx}`);
+            const nextBtn = document.getElementById(`next-btn-${resultIdx}`);
+            
+            // Ensure startIdx is within bounds
+            startIdx = Math.max(0, Math.min(startIdx, data.totalDims - 3));
+            data.currentStart = startIdx;
+            
+            // Update range label
+            const endIdx = Math.min(startIdx + 3, data.totalDims);
+            rangeLabel.textContent = `Dimensions ${startIdx + 1}-${endIdx}`;
+            
+            // Update button states
+            prevBtn.disabled = startIdx === 0;
+            nextBtn.disabled = startIdx + 3 >= data.totalDims;
+            
+            // Render dimensions
+            let html = '';
+            for (let i = startIdx; i < endIdx; i++) {
+                const qVal = data.queryEmb[i];
+                const cVal = data.chunkEmb[i];
+                const diff = Math.abs(qVal - cVal);
+                
+                // Generate bars
+                const qBars = generateBar(qVal);
+                const cBars = generateBar(cVal);
+                
+                // Determine label
+                let label = '';
+                let labelColor = '';
+                if (diff < 0.01) {
+                    label = '↑ Nearly identical!';
+                    labelColor = 'text-green-600 font-semibold';
+                } else if (diff < 0.03) {
+                    label = '↑ Very close!';
+                    labelColor = 'text-green-500';
+                } else if (diff < 0.08) {
+                    label = '↑ Close!';
+                    labelColor = 'text-blue-600';
+                } else if (diff < 0.15) {
+                    label = '↑ Somewhat similar';
+                    labelColor = 'text-yellow-600';
+                } else {
+                    label = '↑ Different';
+                    labelColor = 'text-gray-500';
+                }
+                
+                // Get word/bigram for custom models
+                let dimLabel = `Dimension ${i + 1}`;
+                if (data.modelType === 'custom' && data.vocabulary && i < data.vocabulary.length) {
+                    const word = data.vocabulary[i];
+                    dimLabel = `Dimension ${i + 1}: <span class="text-indigo-700 font-semibold">"${word}"</span>`;
+                }
+                
+                html += `
+                    <div class="bg-white p-2 rounded border border-indigo-200">
+                        <p class="text-gray-500 text-xs mb-1">${dimLabel}</p>
+                        ${data.modelType === 'custom' ? '<p class="text-xs text-indigo-600 mb-1">TF-IDF scores for this word/bigram:</p>' : ''}
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="w-12 text-gray-600 text-xs">Query:</span>
+                            <span class="w-16 ${qVal >= 0 ? 'text-blue-700' : 'text-red-700'} text-right">${qVal.toFixed(3)}</span>
+                            <span class="${qVal >= 0 ? 'text-blue-600' : 'text-red-600'}">${qBars}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-12 text-gray-600 text-xs">Result:</span>
+                            <span class="w-16 ${cVal >= 0 ? 'text-blue-700' : 'text-red-700'} text-right">${cVal.toFixed(3)}</span>
+                            <span class="${cVal >= 0 ? 'text-blue-600' : 'text-red-600'}">${cBars}</span>
+                            <span class="${labelColor} text-xs">${label}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            displayArea.innerHTML = html;
+        }
+        
+        // Generate ASCII bar for a value
+        function generateBar(val) {
+            const absVal = Math.abs(val);
+            const filled = Math.min(Math.floor(absVal * 10), 10);
+            const empty = 10 - filled;
+            return '[' + '█'.repeat(filled) + '░'.repeat(empty) + ']';
+        }
+        
+        // Browse dimensions (move by offset)
+        function browseDimensions(resultIdx, offset) {
+            const data = embeddingData[resultIdx];
+            if (!data) return;
+            
+            const newStart = data.currentStart + offset;
+            renderDimensions(resultIdx, newStart);
+        }
+        
+        // Track active KB filters (all active by default)
+        const activeKbFilters = new Set();
+        
+        function toggleKbFilter(kbName) {
+            const btn = document.getElementById(`filter-${kbName}`);
+            
+            if (activeKbFilters.has(kbName)) {
+                // Deactivate
+                activeKbFilters.delete(kbName);
+                btn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                btn.classList.add('bg-blue-100', 'text-blue-700', 'hover:bg-blue-200');
+            } else {
+                // Activate
+                activeKbFilters.add(kbName);
+                btn.classList.remove('bg-blue-100', 'text-blue-700', 'hover:bg-blue-200');
+                btn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+            }
+            
+            applyKbFilters();
+        }
+        
+        function showAllKbs() {
+            // Activate all KBs
+            document.querySelectorAll('.kb-filter-btn').forEach(btn => {
+                const kbName = btn.id.replace('filter-', '');
+                activeKbFilters.add(kbName);
+                btn.classList.remove('bg-blue-100', 'text-blue-700', 'hover:bg-blue-200');
+                btn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+            });
+            
+            applyKbFilters();
+        }
+        
+        function applyKbFilters() {
+            const resultCards = document.querySelectorAll('.result-card');
+            let visibleCount = 0;
+            
+            resultCards.forEach(card => {
+                const kbName = card.getAttribute('data-kb');
+                if (activeKbFilters.has(kbName)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update result count if needed
+            // You could add a counter element here if desired
+        }
+        
+        function toggleExplanation(index) {
+            const explanation = document.getElementById(`explanation-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            if (explanation.classList.contains('show')) {
+                explanation.classList.remove('show');
+                icon.textContent = '+';
+            } else {
+                explanation.classList.add('show');
+                icon.textContent = '−';
+            }
+        }
+    </script>
+</body>
+</html>

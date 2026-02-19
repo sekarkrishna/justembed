@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs - JustEmbed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">Background Jobs</h1>
+            
+            <!-- Job Stats -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-yellow-800">{{ stats.queued }}</div>
+                    <div class="text-sm text-yellow-600">Queued</div>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-800">{{ stats.running }}</div>
+                    <div class="text-sm text-blue-600">Running</div>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-800">{{ stats.complete }}</div>
+                    <div class="text-sm text-green-600">Complete</div>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-red-800">{{ stats.failed }}</div>
+                    <div class="text-sm text-red-600">Failed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs List -->
+        <div class="space-y-4">
+            {% if jobs|length == 0 %}
+            <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <p class="text-lg">No jobs yet</p>
+                <p class="text-sm mt-2">Jobs will appear here when you train models or embed documents</p>
+            </div>
+            {% else %}
+            {% for job in jobs %}
+            <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="text-lg font-semibold text-gray-900">
+                                {% if job.job_type == 'train_model' %}
+                                🧠 Model Training
+                                {% elif job.job_type == 'embed_chunks' %}
+                                📊 Embedding Chunks
+                                {% else %}
+                                {{ job.job_type }}
+                                {% endif %}
+                            </span>
+                            <span class="px-2 py-1 rounded text-xs font-semibold
+                                {% if job.status == 'complete' %}bg-green-100 text-green-800
+                                {% elif job.status == 'failed' %}bg-red-100 text-red-800
+                                {% elif job.status == 'running' %}bg-blue-100 text-blue-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ job.status.upper() }}
+                            </span>
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 mb-3">
+                            {% if job.message %}
+                            <p>{{ job.message }}</p>
+                            {% endif %}
+                            <p class="text-xs text-gray-500 mt-1">
+                                Created: {{ job.created_at[:19].replace('T', ' ') }}
+                                {% if job.completed_at %}
+                                | Completed: {{ job.completed_at[:19].replace('T', ' ') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Progress Bar for Running Jobs -->
+                        {% if job.status in ['queued', 'running'] %}
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs text-gray-600">Progress</span>
+                                <span class="text-xs font-semibold">{{ job.progress }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ job.progress }}%"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Error Message -->
+                        {% if job.status == 'failed' and job.error %}
+                        <div class="bg-red-50 border border-red-200 rounded p-2 mb-3">
+                            <p class="text-xs text-red-700 font-mono">{{ job.error }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="ml-4">
+                        <a href="/jobs/{{ job.job_id }}" 
+                           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                Copyright © Krishnamoorthy Sankaran | <a href="https://sekarkrishna.github.io/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">Docs</a> | 
+                <a href="https://github.com/sekarkrishna/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">GitHub</a> | 
+                <a href="https://pypi.org/project/justembed" target="_blank" class="text-blue-600 hover:text-blue-800">PyPI</a> | 
+                <a href="https://opensource.org/licenses/MIT" target="_blank" class="text-blue-600 hover:text-blue-800">MIT License</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-refresh page every 5 seconds if there are running jobs
+        const hasRunningJobs = {{ 'true' if stats.running > 0 or stats.queued > 0 else 'false' }};
+        if (hasRunningJobs) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+---
+title: "Examples"
+---
+
+## Medical Embedding Demo
+
+JustEmbed ships with two example medical text files you can use to see how training and KB content work.
+
+### Files
+
+| File | Use |
+|------|-----|
+| `medical_embedding_demo.txt` | **Training** the custom ONNX model (vocabulary) |
+| `medical_kb_documents.txt` | **Adding to a KB** (documents to search) |
+
+Path (after install): inside the `justembed` package, e.g. `justembed/examples/` (or copy from [GitHub](https://github.com/sekarkrishna/justembed)).
+
+### Workflow
+
+1. **Train** a custom model on `medical_embedding_demo.txt` (Web UI: Train Custom Model, or API: `je.train_model("medical_demo", "path/to/medical_embedding_demo.txt")`).
+2. **Create a KB** with that custom model (or use E5).
+3. **Add to KB** the file `medical_kb_documents.txt` (Upload → Preview → Apply chunking → Embed).
+4. **Query** with e.g. `fever`, `paracetamol`, `neutropenia`, `febrile neutropenia`, `UTI`.
+
+### Chunking Defaults
+
+- Max tokens: 300  
+- Merge threshold: 50  
+- Split by headings and paragraphs  
+
+`medical_embedding_demo.txt` yields 7 chunks; `medical_kb_documents.txt` yields 4 chunks.
+
+### Suggested Test Queries
+
+**Custom model** (terms appear in training or KB text):
+
+- `fever`, `pyrexia`, `paracetamol`, `acetaminophen`, `neutropenia`, `febrile neutropenia`, `antipyretic`
+
+**E5** (semantic; can match concepts not literally in the text):
+
+- `temperature regulation`, `low white blood cells`, `pain relief medicine`, `drug for fever`
+
+## Python Snippet
+
+```python
+import justembed as je
+
+je.register_workspace("~/justembed_demo")
+je.begin(workspace="~/justembed_demo", background=True)
+
+# Train on vocabulary text
+je.train_model("medical_demo", "path/to/medical_embedding_demo.txt")
+
+# Create KB and add documents to search
+je.create_kb("medical_kb", model="medical_demo")
+je.add(kb="medical_kb", path="path/to/medical_kb_documents.txt")
+
+# Query
+results = je.query("paracetamol", kb="medical_kb", top_k=5)
+for r in results:
+    print(f"{r['score']:.3f} | {r['text'][:80]}...")
+```
+
+## Understanding Results
+
+- **Score**: Cosine similarity (0.0–1.0). Higher = more similar to the query.
+- **Custom model**: Best when query words appeared in the training or document text.
+- **E5**: Can retrieve by meaning even when the exact query word is absent.
